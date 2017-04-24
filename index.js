@@ -1,4 +1,4 @@
-const urlToPdf = require('./urlToPdf')
+const urlToPdf = require('./url-to-pdf')
 
 exports.handler = (event, context, callback) => {
     const { url, delay } = event

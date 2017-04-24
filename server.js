@@ -1,7 +1,7 @@
 const express = require('express')
 const bodyParser = require('body-parser')
 const app = express()
-const urlToPdf = require('./urlToPdf')
+const urlToPdf = require('./url-to-pdf')
 const PORT = 3005
 
 app.use(bodyParser.json())
