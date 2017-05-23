@@ -60,7 +60,7 @@ module.exports = ({url, delay = 500, search = null}) => new Promise((resolve, re
     const {Page, DOM} = chromeInstance
     Page.enable()
     .then(() => Page.navigate({url}))
-    .then(() => onLoad(Page, delay))
+    .then(() => onLoad(Page, parseInt(delay,10)))
     .then(() => onFound(DOM, search))
     .then(() => printPDF(Page))
     .then((pdf) => {
