@@ -27,7 +27,7 @@ function delay(time) {
 }
 
 function printPDF(Page) {
-  // console.log('printing!')
+  console.log('printing!')
   return new Promise((resolve) => Page.printToPDF().then(resolve))
 }
 
@@ -54,14 +54,15 @@ function onFound(DOM, search) {
   })
 }
 
-module.exports = ({url, delay = 500, search = null}) => new Promise((resolve, reject) =>
+module.exports = ({url, delay: delayTime = 500, search = null}) => new Promise((resolve, reject) =>
   Chrome.New({ port:CHROME_PORT })
   .then(() => Chrome((chromeInstance) => {
     const {Page, DOM} = chromeInstance
     Page.enable()
     .then(() => Page.navigate({url}))
-    .then(() => onLoad(Page, parseInt(delay,10)))
+    .then(() => onLoad(Page))
     .then(() => onFound(DOM, search))
+    .then(() => delayTime ? delay(parseInt(delayTime,10)) : Promise.resolve())
     .then(() => printPDF(Page))
     .then((pdf) => {
       chromeInstance.close()
