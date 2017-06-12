@@ -1,9 +1,15 @@
 const Chrome = require('chrome-remote-interface')
 const path = require('path')
+const onExit = require('signal-exit')
 const spawn = require('child_process').spawn
 const CHROME_PORT = 9222
 
-spawn(path.resolve(__dirname, 'chrome/headless_shell'), ['--no-sandbox', '--disable-gpu', `--remote-debugging-port=${CHROME_PORT}`])
+const p = spawn(path.resolve(__dirname, 'chrome/headless_shell'), ['--no-sandbox', '--disable-gpu', `--remote-debugging-port=${CHROME_PORT}`])
+
+onExit((code, signal) => {
+  console.log('killing now', code, signal)
+  p.kill(signal)
+})
 
 function tryQuery(DOM, docId, query, maxTries = 120) {
   return new Promise((resolve, reject) =>
@@ -54,24 +60,44 @@ function onFound(DOM, search) {
   })
 }
 
-module.exports = ({url, delay: delayTime = 500, search = null}) => new Promise((resolve, reject) =>
-  Chrome.New({ port:CHROME_PORT })
-  .then(() => Chrome((chromeInstance) => {
-    const {Page, DOM} = chromeInstance
-    Page.enable()
-    .then(() => Page.navigate({url}))
-    .then(() => onLoad(Page))
-    .then(() => onFound(DOM, search))
-    .then(() => delayTime ? delay(parseInt(delayTime,10)) : Promise.resolve())
-    .then(() => printPDF(Page))
-    .then((pdf) => {
-      chromeInstance.close()
-      resolve(pdf)
+function connect(count = 0) {
+    console.log(`Connection attempt ${count}`)
+    const maxTries = 150;
+    return new Promise((resolve, reject) => {
+      Chrome({port: CHROME_PORT}).then(resolve)
+      .catch((err) => {
+        if(count < maxTries) {
+          console.log('Busy... retry in 1sec');
+          resolve(delay(1000).then(() => connect(count+1)))
+        } else {
+          console.log('Failed, no more retry');
+          reject(err)
+        }
+      })
     })
-    .catch((err) => {
-      chromeInstance.close()
-      reject(err)
+}
+
+function urlToPdf({url, delay: delayTime = 500, search = null}) {
+  return new Promise((resolve, reject) =>
+    connect()
+    .then((chromeInstance) => {
+      const {Page, DOM} = chromeInstance
+      Page.enable()
+      .then(() => Page.navigate({url}))
+      .then(() => onLoad(Page))
+      .then(() => onFound(DOM, search))
+      .then(() => delayTime ? delay(parseInt(delayTime,10)) : Promise.resolve())
+      .then(() => printPDF(Page))
+      .then((pdf) => {
+        chromeInstance.close()
+        .then(resolve(pdf))
+      })
+      .catch((err) => {
+        chromeInstance.close()
+        .then(reject(err))
+      })
     })
-  }
-  ))
-)
+  )
+}
+
+module.exports = urlToPdf
