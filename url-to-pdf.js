@@ -19,10 +19,11 @@ function tryQuery(DOM, docId, query, maxTries = 120) {
         resolve(nodeId)
       }
       else {
-        resolve(delay(500).then(() => tryQuery(DOM, docId, query, maxTries-1)))
-      }
-      if (maxTries < 1) {
-        reject(new Error('Can\'t find query selector: ',query))
+        if (maxTries < 1) {
+          reject(new Error('Can\'t find query selector: ', query))
+        } else {
+          resolve(delay(500).then(() => tryQuery(DOM, docId, query, maxTries - 1)))
+        }
       }
     })
   )
