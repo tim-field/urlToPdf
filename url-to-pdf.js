@@ -12,7 +12,7 @@ onExit((code, signal) => {
 })
 
 function tryQuery(DOM, docId, query, maxTries = 100) {
-  console.log('tryQuery', querySelector, maxTries)
+  console.log('tryQuery', query, maxTries)
   return new Promise((resolve, reject) =>
     DOM.querySelector({nodeId: docId, selector: query})
     .then(({nodeId}) => {
