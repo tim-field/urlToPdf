@@ -66,7 +66,8 @@ function connect(count = 0) {
     console.log(`Connection attempt ${count}`)
     const maxTries = 150;
     return new Promise((resolve, reject) => {
-      Chrome({port: CHROME_PORT}).then(resolve)
+      Chrome.New({port: CHROME_PORT})
+      .then((target) => resolve(Chrome({target})))
       .catch((err) => {
         if(count < maxTries) {
           console.log('Busy... retry in 1sec');
@@ -83,7 +84,7 @@ function urlToPdf({url, delay: delayTime = 500, search = null}) {
   return new Promise((resolve, reject) =>
     connect()
     .then((chromeInstance) => {
-      const {Page, DOM} = chromeInstance
+      const {Page, DOM, target: {id}} = chromeInstance
       Page.enable()
       .then(() => Page.navigate({url}))
       .then(() => onLoad(Page))
@@ -91,11 +92,14 @@ function urlToPdf({url, delay: delayTime = 500, search = null}) {
       .then(() => delayTime ? delay(parseInt(delayTime,10)) : Promise.resolve())
       .then(() => printPDF(Page))
       .then((pdf) => {
-        chromeInstance.close()
+        console.log('closing target' ,id)
+        // chromeInstance.close()
+        Chrome.Close({id})
         .then(resolve(pdf))
       })
       .catch((err) => {
-        chromeInstance.close()
+        // chromeInstance.close()
+        Chrome.Close({id})
         .then(reject(err))
       })
     })
