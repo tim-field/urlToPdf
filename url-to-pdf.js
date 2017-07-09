@@ -5,6 +5,7 @@ const spawn = require('child_process').spawn
 const CHROME_PORT = 9222
 
 const p = spawn(path.resolve(__dirname, 'chrome/headless_shell'), ['--no-sandbox', '--disable-gpu', `--remote-debugging-port=${CHROME_PORT}`])
+//const p = spawn('google-chrome', ['--headless', '--disable-gpu', '--remote-debugging-port=9222'])
 
 onExit((code, signal) => {
   console.log('killing now', code, signal)
@@ -62,48 +63,78 @@ function onFound(DOM, search) {
   })
 }
 
-function connect(count = 0) {
-    console.log(`Connection attempt ${count}`)
-    const maxTries = 150;
-    return new Promise((resolve, reject) => {
-      Chrome.New({port: CHROME_PORT})
-      .then((target) => resolve(Chrome({target})))
-      .catch((err) => {
-        if(count < maxTries) {
-          console.log('Busy... retry in 1sec');
-          resolve(delay(1000).then(() => connect(count+1)))
-        } else {
-          console.log('Failed, no more retry');
-          reject(err)
-        }
-      })
-    })
+async function doInNewContext(action, params) {
+    // connect to the DevTools special target
+    const browser = await Chrome({target: `ws://localhost:${CHROME_PORT}/devtools/browser`});
+    // create a new context
+    const {Target} = browser;
+    const {browserContextId} = await Target.createBrowserContext();
+    const {targetId} = await Target.createTarget({
+        url: 'about:blank',
+        browserContextId
+    });
+
+    let res = null;
+    // connct to the new context
+    const client = await Chrome({target: targetId});
+    // perform user actions on it
+    try {
+        res = await action(client, params);
+    } finally {
+        // cleanup
+        await Target.closeTarget({targetId});
+        await browser.close();
+    }
+
+    return res;
 }
 
-function urlToPdf({url, delay: delayTime = 500, search = null}) {
-  return new Promise((resolve, reject) =>
-    connect()
-    .then((chromeInstance) => {
-      const {Page, DOM, target: {id}} = chromeInstance
-      Page.enable()
-      .then(() => Page.navigate({url}))
-      .then(() => onLoad(Page))
-      .then(() => onFound(DOM, search))
-      .then(() => delayTime ? delay(parseInt(delayTime,10)) : Promise.resolve())
-      .then(() => printPDF(Page))
-      .then((pdf) => {
-        console.log('closing target' ,id)
-        // chromeInstance.close()
-        Chrome.Close({id})
-        .then(resolve(pdf))
-      })
-      .catch((err) => {
-        // chromeInstance.close()
-        Chrome.Close({id})
-        .then(reject(err))
-      })
-    })
-  )
+async function generatePDF(client, params) {
+  const {url, delay: delayTime = 500, search = null} = params
+  const {Network, Page, DOM} = client
+
+  console.log(params)
+
+  await Page.enable()
+  await Page.navigate({url})
+  await onLoad(Page)
+  await onFound(DOM, search)
+  if (delayTime) {
+    await delay(parseInt(delayTime,10))
+  }
+
+  return printPDF(Page)
 }
+
+
+function urlToPdf(params) {
+  return doInNewContext(generatePDF, params)
+}
+
+// function urlToPdf({url, delay: delayTime = 500, search = null}) {
+//   return new Promise((resolve, reject) =>
+//     connect()
+//     .then((chromeInstance) => {
+//       const {Page, DOM, target: {id}} = chromeInstance
+//       Page.enable()
+//       .then(() => Page.navigate({url}))
+//       .then(() => onLoad(Page))
+//       .then(() => onFound(DOM, search))
+//       .then(() => delayTime ? delay(parseInt(delayTime,10)) : Promise.resolve())
+//       .then(() => printPDF(Page))
+//       .then((pdf) => {
+//         console.log('closing target' ,id)
+//         // chromeInstance.close()
+//         Chrome.Close({id})
+//         .then(resolve(pdf))
+//       })
+//       .catch((err) => {
+//         // chromeInstance.close()
+//         Chrome.Close({id})
+//         .then(reject(err))
+//       })
+//     })
+//   )
+// }
 
 module.exports = urlToPdf
