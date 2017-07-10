@@ -52,6 +52,10 @@ function onFound(DOM, search) {
   })
 }
 
+/**
+ * Reference
+ * https://github.com/cyrus-and/chrome-remote-interface/wiki/Load-a-URL-in-a-separate-context-(headless-mode-only)
+ */
 async function doInNewContext(action, params) {
     // connect to the DevTools special target
     const browser = await Chrome({target: `ws://localhost:${CHROME_PORT}/devtools/browser`});
