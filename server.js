@@ -6,7 +6,6 @@ const PORT = 3005
 
 app.use(bodyParser.json())
 
-// Just to demonstrate the app working fetch on root of the app causes the PDF to be generated.
 app.post('/', (req, res) => {
   const {url, delay, search} = req.body
   urlToPdf({url, delay, search}).then((data) => {
