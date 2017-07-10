@@ -106,35 +106,8 @@ async function generatePDF(client, params) {
   return printPDF(Page)
 }
 
-
 function urlToPdf(params) {
   return doInNewContext(generatePDF, params)
 }
-
-// function urlToPdf({url, delay: delayTime = 500, search = null}) {
-//   return new Promise((resolve, reject) =>
-//     connect()
-//     .then((chromeInstance) => {
-//       const {Page, DOM, target: {id}} = chromeInstance
-//       Page.enable()
-//       .then(() => Page.navigate({url}))
-//       .then(() => onLoad(Page))
-//       .then(() => onFound(DOM, search))
-//       .then(() => delayTime ? delay(parseInt(delayTime,10)) : Promise.resolve())
-//       .then(() => printPDF(Page))
-//       .then((pdf) => {
-//         console.log('closing target' ,id)
-//         // chromeInstance.close()
-//         Chrome.Close({id})
-//         .then(resolve(pdf))
-//       })
-//       .catch((err) => {
-//         // chromeInstance.close()
-//         Chrome.Close({id})
-//         .then(reject(err))
-//       })
-//     })
-//   )
-// }
 
 module.exports = urlToPdf
