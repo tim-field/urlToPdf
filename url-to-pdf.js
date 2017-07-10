@@ -40,17 +40,6 @@ function printPDF(Page) {
   return new Promise((resolve) => Page.printToPDF().then(resolve))
 }
 
-function onLoad(Page, delayTime) {
-  return new Promise((resolve) =>
-    Page.loadEventFired(() => {
-      if(delayTime) {
-        return delay(delayTime).then(resolve)
-      }
-      return resolve()
-    })
-  );
-}
-
 function onFound(DOM, search) {
   return new Promise((resolve) => {
     if(search) {
@@ -97,7 +86,7 @@ async function generatePDF(client, params) {
 
   await Page.enable()
   await Page.navigate({url})
-  await onLoad(Page)
+  await Page.loadEventFired()
   await onFound(DOM, search)
   if (delayTime) {
     await delay(parseInt(delayTime,10))
