@@ -4,8 +4,8 @@ const onExit = require('signal-exit')
 const spawn = require('child_process').spawn
 const CHROME_PORT = 9222
 
-const p = spawn(path.resolve(__dirname, 'chrome/headless_shell'), ['--no-sandbox', '--disable-gpu', `--remote-debugging-port=${CHROME_PORT}`])
-//const p = spawn('google-chrome', ['--headless', '--disable-gpu', '--remote-debugging-port=9222'])
+//const p = spawn(path.resolve(__dirname, 'chrome/headless_shell'), ['--no-sandbox', '--disable-gpu', `--remote-debugging-port=${CHROME_PORT}`])
+const p = spawn('google-chrome', ['--headless', '--disable-gpu', '--no-sandbox', `--remote-debugging-port=${CHROME_PORT}`])
 
 onExit((code, signal) => {
   console.log('killing now', code, signal)
