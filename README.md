@@ -1,5 +1,7 @@
 ## Use headless Chrome to generate PDF's ##
 
+Note, this is rather specific to a use case I have, and should potentially be used a more of a guide than a dependency in your project. Happy for pull requests that make it more configurable. 
+
 ### Setup ###
 
 sudo apt-get install libxss1 libappindicator1 libindicator7

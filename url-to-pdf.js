@@ -37,7 +37,15 @@ function delay(time) {
 
 function printPDF(Page) {
   console.log('printing!')
-  return new Promise((resolve) => Page.printToPDF().then(resolve))
+  return new Promise((resolve) => Page.printToPDF({
+    printBackground: true,
+    marginTop: 0.1,
+    marginBottom: 0.1,
+    marginRight: 0.1,
+    marginLeft: 0.1,
+    paperWidth: 8.3,
+    paperHeight: 11.7
+  }).then(resolve))
 }
 
 function onFound(DOM, search) {
