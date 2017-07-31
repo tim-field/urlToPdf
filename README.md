@@ -1,7 +1,7 @@
 ## Use headless Chrome to generate PDF's ##
 
-Note, this is rather specific to a use case I have, and should potentially be used as more of a guide than a dependency in your own project. 
-Happy for pull requests that make it more configurable. 
+Note, this is rather specific to a use case I have and not designed for public consumption. Should probably be used as more of a guide than a dependency in your own project. 
+However I'm happy for pull requests that make it more configurable. 
 
 ### Setup ###
 ```
