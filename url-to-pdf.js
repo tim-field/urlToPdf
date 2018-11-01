@@ -22,7 +22,7 @@ function tryQuery(DOM, docId, query, maxTries = 100) {
       }
       else {
         if (maxTries < 1) {
-          reject(new Error('Can\'t find query selector: ', query))
+          reject(new Error(`Can't find query selector ${query}`))
         } else {
           resolve(delay(500).then(() => tryQuery(DOM, docId, query, maxTries - 1)))
         }
