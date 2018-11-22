@@ -13,7 +13,6 @@ sudo apt-get install -f
 
 ## Developing on Mac
 
-* You need to install **git-lfs** BEFORE cloning this repo: `brew install git-lfs`
 * On Mac, the chrome executable is not called `google-chrome`, so before running server.js
   run the following command from the root of this repo
 
