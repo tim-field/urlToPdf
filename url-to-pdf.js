@@ -2,10 +2,12 @@ const Chrome = require("chrome-remote-interface")
 const path = require("path")
 const onExit = require("signal-exit")
 const spawn = require("child_process").spawn
+const CHROME_CMD = process.env.CHROME_CMD || 'google-chrome';
 const CHROME_PORT = 9222
 
 //const p = spawn(path.resolve(__dirname, 'chrome/headless_shell'), ['--no-sandbox', '--disable-gpu', `--remote-debugging-port=${CHROME_PORT}`])
-const p = spawn("google-chrome", [
+console.log('starting', CHROME_CMD)
+const p = spawn(CHROME_CMD, [
   "--headless",
   "--disable-gpu",
   "--no-sandbox",
