@@ -2,11 +2,11 @@ const Chrome = require("chrome-remote-interface")
 const path = require("path")
 const onExit = require("signal-exit")
 const spawn = require("child_process").spawn
-const CHROME_CMD = process.env.CHROME_CMD || 'google-chrome';
+const CHROME_CMD = process.env.CHROME_CMD || "google-chrome"
 const CHROME_PORT = 9222
 
 //const p = spawn(path.resolve(__dirname, 'chrome/headless_shell'), ['--no-sandbox', '--disable-gpu', `--remote-debugging-port=${CHROME_PORT}`])
-console.log('starting', CHROME_CMD)
+console.log("starting", CHROME_CMD)
 const p = spawn(CHROME_CMD, [
   "--headless",
   "--disable-gpu",
@@ -58,11 +58,12 @@ function printPDF(Page) {
 }
 
 function onFound(DOM, search) {
-  return new Promise(resolve => {
+  return new Promise((resolve, reject) => {
     if (search) {
       return DOM.getDocument()
         .then(doc => tryQuery(DOM, doc.root.nodeId, search))
         .then(resolve)
+        .catch(reject)
     } else {
       return resolve()
     }
@@ -111,7 +112,7 @@ async function doInNewContext(action, params) {
 
 async function generatePDF(client, params) {
   const { url, delay: delayTime = 500, search = null } = params
-  const { Network, Page, DOM } = client
+  const { Page, DOM } = client
 
   console.log(params)
 
