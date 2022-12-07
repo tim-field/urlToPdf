@@ -2,7 +2,7 @@
   "dependencies": {
     "body-parser": "^1.17.1",
     "chrome-remote-interface": "^0.26.1",
-    "express": "^4.15.2",
+    "express": "^4.17.3",
     "signal-exit": "^3.0.2"
   }
 }
